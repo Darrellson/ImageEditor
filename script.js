@@ -58,6 +58,9 @@ const drawCropBox = () => {
   ctx.strokeRect(startX, startY, width, height);
 };
 
+// Call startCrop function immediately to start listening for mouse events
+startCrop();
+
 /**
  * Handle click event to add text on the canvas.
  */
@@ -91,6 +94,7 @@ document.getElementById("upload").addEventListener("change", (event) => {
     };
     img.src = e.target.result;
     document.getElementById("uploaded-image").src = e.target.result;
+    document.getElementById("uploaded-image").hidden;
   };
   reader.readAsDataURL(file);
 });
