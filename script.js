@@ -7,18 +7,20 @@ let endX = 0;
 let endY = 0;
 let isDrawing = false;
 let textColor = "#000000"; // Initial text color
+let currentText = null; // To store the current text object
+let selectionRect = null; // To store the selection rectangle
 
 /**
- * Start the crop action by adding event listeners to the canvas.
+ * Start the selection action by adding event listeners to the canvas.
  */
-const startCrop = () => {
+const startSelection = () => {
   canvas.addEventListener("mousedown", handleMouseDown);
   canvas.addEventListener("mousemove", handleMouseMove);
   canvas.addEventListener("mouseup", handleMouseUp);
 };
 
 /**
- * Handle mouse down event to initiate drawing.
+ * Handle mouse down event to initiate selection.
  * @param {MouseEvent} event - The mouse event object.
  */
 const handleMouseDown = (event) => {
@@ -28,27 +30,33 @@ const handleMouseDown = (event) => {
 };
 
 /**
- * Handle mouse move event to update drawing position.
+ * Handle mouse move event to update selection rectangle.
  * @param {MouseEvent} event - The mouse event object.
  */
 const handleMouseMove = (event) => {
   if (!isDrawing) return;
   endX = event.offsetX;
   endY = event.offsetY;
-  drawCropBox();
+  drawSelectionRect();
 };
 
 /**
- * Handle mouse up event to end drawing action.
+ * Handle mouse up event to end selection action.
  */
 const handleMouseUp = () => {
   isDrawing = false;
+  selectionRect = {
+    x: startX,
+    y: startY,
+    width: endX - startX,
+    height: endY - startY,
+  };
 };
 
 /**
- * Draw a crop box on the canvas.
+ * Draw the selection rectangle on the canvas.
  */
-const drawCropBox = () => {
+const drawSelectionRect = () => {
   const width = endX - startX;
   const height = endY - startY;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -58,8 +66,7 @@ const drawCropBox = () => {
   ctx.strokeRect(startX, startY, width, height);
 };
 
-// Call startCrop function immediately to start listening for mouse events
-startCrop();
+startSelection();
 
 /**
  * Handle click event to add text on the canvas.
@@ -67,9 +74,14 @@ startCrop();
 canvas.addEventListener("click", () => {
   const text = prompt("Enter text:");
   if (!text) return;
-  ctx.fillStyle = textColor; // Use current text color
+  ctx.fillStyle = textColor;
   ctx.font = "30px Arial";
-  ctx.fillText(text, startX, startY);
+  ctx.fillText(
+    text,
+    selectionRect.x + selectionRect.width / 2,
+    selectionRect.y + selectionRect.height / 2
+  );
+  currentText = { text, x: selectionRect.x, y: selectionRect.y };
 });
 
 /**
@@ -77,6 +89,12 @@ canvas.addEventListener("click", () => {
  */
 colorInput.addEventListener("change", () => {
   textColor = colorInput.value; // Update text color when color input changes
+  if (currentText) {
+    // If there's a current text object, update its color
+    ctx.fillStyle = textColor;
+    // Update text color
+    ctx.fillText(currentText.text, currentText.x, currentText.y);
+  }
 });
 
 /**
@@ -111,3 +129,15 @@ const saveImage = () => {
   };
   console.log(JSON.stringify(properties));
 };
+
+const canvasInfo = {
+  canvasWidth: canvas.width,
+  canvasHeight: canvas.height,
+  contextProperties: {
+    fillStyle: ctx.fillStyle,
+    strokeStyle: ctx.strokeStyle,
+    lineWidth: ctx.lineWidth,
+  },
+};
+
+console.log(canvasInfo);
