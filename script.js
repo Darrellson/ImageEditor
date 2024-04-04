@@ -2,6 +2,7 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const colorInput = document.getElementById("color");
 const uploadInput = document.getElementById("upload");
+const rectColorInput = document.getElementById("rectColor");
 let startX = 0;
 let startY = 0;
 let endX = 0;
@@ -38,7 +39,7 @@ const handleMouseMove = (event) => {
   if (!isDrawing) return;
   endX = event.offsetX;
   endY = event.offsetY;
-  drawSelectionRect();
+  drawSelectionRect(colorInput.value); // Pass the color input value to the function
 };
 
 /**
@@ -53,6 +54,10 @@ const handleMouseUp = () => {
     height: endY - startY,
   };
 };
+
+rectColorInput.addEventListener("input", () => {
+  drawSelectionRect();
+});
 
 /**
  * Draw the selection rectangle on the canvas.
@@ -70,11 +75,32 @@ const drawSelectionRect = () => {
       canvas.height
     );
   }
-  ctx.fillStyle = "#000000"; // Set black color for the background
-  ctx.fillRect(startX, startY, width, height); // Fill the selection area with black
-  ctx.strokeStyle = "#FF0000";
+  ctx.fillStyle = rectColorInput.value; // Set fill color to the selected color
+  ctx.fillRect(startX, startY, width, height);
   ctx.lineWidth = 2;
+  ctx.strokeStyle = "#000"; // Set stroke color to black
   ctx.strokeRect(startX, startY, width, height);
+};
+
+/**
+ * Redraws the canvas.
+ */
+const redrawCanvas = () => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+  if (document.getElementById("uploaded-image").complete) {
+    ctx.drawImage(
+      document.getElementById("uploaded-image"),
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+  }
+  if (currentText) {
+    ctx.fillStyle = textColor;
+    ctx.font = "30px Arial";
+    ctx.fillText(currentText.text, currentText.x, currentText.y); // Redraw the text with the new color
+  }
 };
 
 startSelection();
@@ -95,15 +121,10 @@ canvas.addEventListener("click", () => {
   currentText = { text, x: selectionRect.x, y: selectionRect.y };
 });
 
-/**
- * Listen for color input change event to update text color.
- */
-colorInput.addEventListener("change", () => {
+// Listen for color input change event to update text color
+colorInput.addEventListener("input", () => {
   textColor = colorInput.value;
-  if (currentText) {
-    ctx.fillStyle = textColor;
-    ctx.fillText(currentText.text, currentText.x, currentText.y);
-  }
+  redrawCanvas(); // Redraw the canvas to apply the new text color
 });
 
 /**
@@ -133,7 +154,7 @@ const saveImage = () => {
   const imageData = canvas.toDataURL();
   const rectInfo = {
     rectangle: {
-      color: "#000000",
+      color: colorInput.value, // Change color value to the selected color
       width: selectionRect.width,
       height: selectionRect.height,
       x: selectionRect.x,

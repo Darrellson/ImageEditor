@@ -12,10 +12,6 @@
         <div class="position-relative">
             <canvas id="canvas" width="800" height="600"></canvas>
             <div class="form-group">
-                <label for="shape">Select Shape:</label>
-                <select class="form-control" id="shape">
-                    <option value="rectangle">Rectangle</option>
-                </select>
                 <img id="uploaded-image" class="position-absolute top-0 left-0 img-fluid" src="#" alt="Uploaded Image"
                     hidden>
                 <div class="form-group">
@@ -26,6 +22,10 @@
             <div class="form-group mt-3">
                 <label for="color">Choose Color:</label>
                 <input type="color" class="form-control" id="color" value="#000000">
+            </div>
+            <div class="form-group mt-3">
+                <label for="color">Choose Rectangle Color:</label>
+                <input type="color" class="form-control" id="rectColor" value="#000000">
             </div>
             <button class="btn btn-success mt-3" onclick="saveImage()">Save</button>
         </div>
