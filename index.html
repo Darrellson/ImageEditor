@@ -10,20 +10,26 @@
 <body>
     <div class="container editor-container">
         <div class="position-relative">
-            <canvas id="canvas" class="border"></canvas>
-            <img id="uploaded-image" class="position-absolute top-0 left-0 img-fluid" src="#" alt="Uploaded Image"
-                hidden>
+            <canvas id="canvas" width="800" height="600"></canvas>
             <div class="form-group">
-                <label for="upload">Upload Image:</label>
-                <input type="file" class="form-control-file" id="upload" accept="image/*">
+                <label for="shape">Select Shape:</label>
+                <select class="form-control" id="shape">
+                    <option value="rectangle">Rectangle</option>
+                </select>
+                <img id="uploaded-image" class="position-absolute top-0 left-0 img-fluid" src="#" alt="Uploaded Image"
+                    hidden>
+                <div class="form-group">
+                    <label for="upload">Upload Image:</label>
+                    <input type="file" class="form-control-file" id="upload" accept="image/*">
+                </div>
             </div>
+            <div class="form-group mt-3">
+                <label for="color">Choose Color:</label>
+                <input type="color" class="form-control" id="color" value="#000000">
+            </div>
+            <button class="btn btn-success mt-3" onclick="saveImage()">Save</button>
         </div>
-        <div class="form-group mt-3">
-            <label for="color">Choose Color:</label>
-            <input type="color" class="form-control" id="color" value="#000000">
-        </div>
-        <button class="btn btn-success mt-3" onclick="saveImage()">Save</button>
-    </div>
-    <script src="script.js"></script>
+        <script src="script.js"></script>
 </body>
+
 </html>
