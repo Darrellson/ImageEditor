@@ -1,130 +1,196 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const colorInput = document.getElementById("color");
-const uploadInput = document.getElementById("upload");
 const rectColorInput = document.getElementById("rectColor");
-let startX = 0;
-let startY = 0;
+const uploadInput = document.getElementById("upload");
+const saveButton = document.getElementById("saveButton");
+
+let imageLoaded = false;
+let selectedX = 0;
+let selectedY = 0;
 let endX = 0;
 let endY = 0;
-let isDrawing = false;
-let textColor = "#000000";
-let currentText = null;
-let selectionRect = null;
+let isDrawingRectangle = false;
+let isAddingText = false;
+let textObjects = [];
+const rectangles = []; // Array to store rectangle objects {x, y, width, height, color}
 
 /**
- * Start the selection action by adding event listeners to the canvas.
+ * Initialize canvas and set up event listeners.
  */
-const startSelection = () => {
-  canvas.addEventListener("mousedown", handleMouseDown);
-  canvas.addEventListener("mousemove", handleMouseMove);
-  canvas.addEventListener("mouseup", handleMouseUp);
+const initializeCanvas = () => {
+  canvas.addEventListener("mousedown", handleCanvasMouseDown);
+  canvas.addEventListener("mouseup", handleCanvasMouseUp);
 };
 
 /**
- * Handle mouse down event to initiate selection.
+ * Handle mouse down event on canvas to select position.
  * @param {MouseEvent} event - The mouse event object.
  */
-const handleMouseDown = (event) => {
-  startX = event.offsetX;
-  startY = event.offsetY;
-  isDrawing = true;
+const handleCanvasMouseDown = (event) => {
+  if (imageLoaded) {
+    selectedX = event.offsetX;
+    selectedY = event.offsetY;
+    enableDrawingFeatures();
+  }
 };
 
 /**
- * Handle mouse move event to update selection rectangle.
- * @param {MouseEvent} event - The mouse event object.
+ * Handle mouse up event on canvas.
  */
-const handleMouseMove = (event) => {
-  if (!isDrawing) return;
+const handleCanvasMouseUp = (event) => {
   endX = event.offsetX;
   endY = event.offsetY;
-  drawSelectionRect(colorInput.value); // Pass the color input value to the function
 };
 
 /**
- * Handle mouse up event to end selection action.
+ * Enable drawing features after position is selected.
  */
-const handleMouseUp = () => {
-  isDrawing = false;
-  selectionRect = {
-    x: startX,
-    y: startY,
-    width: endX - startX,
-    height: endY - startY,
-  };
+const enableDrawingFeatures = () => {
+  if (!imageLoaded) return;
+
+  canvas.removeEventListener("mousedown", handleCanvasMouseDown);
+
+  document
+    .getElementById("drawButton")
+    .addEventListener("click", startDrawingRectangle);
+  document
+    .getElementById("textButton")
+    .addEventListener("click", startAddingText);
 };
 
-rectColorInput.addEventListener("input", () => {
-  drawSelectionRect();
-});
+/**
+ * Start drawing a rectangle on canvas.
+ */
+const startDrawingRectangle = () => {
+  isDrawingRectangle = true;
+  isAddingText = false;
+  canvas.addEventListener("mousemove", handleDrawingMouseMove);
+  canvas.addEventListener("mouseup", stopDrawingRectangle);
+};
 
 /**
- * Draw the selection rectangle on the canvas.
+ * Handle mouse move event to draw rectangle.
+ * @param {MouseEvent} event - The mouse event object.
  */
-const drawSelectionRect = () => {
+const handleDrawingMouseMove = (event) => {
+  if (isDrawingRectangle) {
+    drawCanvas();
+    drawRectangle(selectedX, selectedY, event.offsetX, event.offsetY);
+  }
+};
+
+/**
+ * Stop drawing the rectangle.
+ */
+const stopDrawingRectangle = () => {
+  isDrawingRectangle = false;
+  canvas.removeEventListener("mousemove", handleDrawingMouseMove);
+
+  // After stopping drawing, add the rectangle to the list
+  const width = Math.abs(endX - selectedX);
+  const height = Math.abs(endY - selectedY);
+  rectangles.push({
+    x: selectedX,
+    y: selectedY,
+    width,
+    height,
+    color: rectColorInput.value,
+  });
+
+  // Redraw canvas to include the new rectangle
+  drawCanvas();
+};
+/**
+ * Draw rectangle on canvas.
+ * @param {number} startX - Starting X coordinate.
+ * @param {number} startY - Starting Y coordinate.
+ * @param {number} endX - Ending X coordinate.
+ * @param {number} endY - Ending Y coordinate.
+ */
+const drawRectangle = (startX, startY, endX, endY) => {
   const width = endX - startX;
   const height = endY - startY;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (document.getElementById("uploaded-image").complete) {
-    ctx.drawImage(
-      document.getElementById("uploaded-image"),
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-  }
-  ctx.fillStyle = rectColorInput.value; // Set fill color to the selected color
+
+  ctx.fillStyle = rectColorInput.value;
   ctx.fillRect(startX, startY, width, height);
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = "#000"; // Set stroke color to black
-  ctx.strokeRect(startX, startY, width, height);
 };
 
 /**
- * Redraws the canvas.
+ * Start adding text on canvas.
  */
-const redrawCanvas = () => {
-  ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-  if (document.getElementById("uploaded-image").complete) {
-    ctx.drawImage(
-      document.getElementById("uploaded-image"),
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-  }
-  if (currentText) {
-    ctx.fillStyle = textColor;
-    ctx.font = "30px Arial";
-    ctx.fillText(currentText.text, currentText.x, currentText.y); // Redraw the text with the new color
+const startAddingText = () => {
+  isAddingText = true;
+  isDrawingRectangle = false;
+  canvas.addEventListener("click", handleAddingTextClick);
+};
+
+/**
+ * Handle click event to add text on canvas.
+ * @param {MouseEvent} event - The mouse event object.
+ */
+const handleAddingTextClick = (event) => {
+  if (isAddingText) {
+    const text = prompt("Enter text:");
+    if (text) {
+      const x = event.offsetX;
+      const y = event.offsetY;
+
+      textObjects.push({ text, x, y, color: colorInput.value });
+      drawCanvas();
+    }
   }
 };
 
-startSelection();
-
 /**
- * Handle click event to add text on the canvas.
+ * Draw all shapes and text on the canvas.
  */
-canvas.addEventListener("click", () => {
-  const text = prompt("Enter text:");
-  if (!text) return;
-  ctx.fillStyle = textColor;
-  ctx.font = "30px Arial";
-  ctx.fillText(
-    text,
-    selectionRect.x + selectionRect.width / 2,
-    selectionRect.y + selectionRect.height / 2
+const drawCanvas = () => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(
+    document.getElementById("uploaded-image"),
+    0,
+    0,
+    canvas.width,
+    canvas.height
   );
-  currentText = { text, x: selectionRect.x, y: selectionRect.y };
+
+  drawAllRectangles();
+  drawAllText();
+};
+/**
+ * Draw all text objects on the canvas.
+ */
+const drawAllText = () => {
+  textObjects.forEach((textObject) => {
+    ctx.fillStyle = textObject.color;
+    ctx.font = "30px Arial";
+    ctx.fillText(textObject.text, textObject.x, textObject.y);
+  });
+};
+
+/**
+ * Draw all rectangles on the canvas.
+ */
+const drawAllRectangles = () => {
+  rectangles.forEach((rect) => {
+    ctx.fillStyle = rect.color;
+    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+  });
+};
+
+/**
+ * Listen for color input change event to update rectangle color.
+ */
+rectColorInput.addEventListener("input", () => {
+  drawAllRectangles(); // Redraw only the rectangles to update their colors
 });
 
-// Listen for color input change event to update text color
+/**
+ * Listen for color input change event to update text color.
+ */
 colorInput.addEventListener("input", () => {
-  textColor = colorInput.value;
-  redrawCanvas(); // Redraw the canvas to apply the new text color
+  drawAllText(); // Redraw only the text to update their colors
 });
 
 /**
@@ -133,52 +199,42 @@ colorInput.addEventListener("input", () => {
 uploadInput.addEventListener("change", (event) => {
   const file = event.target.files[0];
   const reader = new FileReader();
+
   reader.onload = (e) => {
     const img = new Image();
     img.onload = () => {
       canvas.width = img.width;
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      imageLoaded = true;
+      initializeCanvas();
     };
     img.src = e.target.result;
     document.getElementById("uploaded-image").src = e.target.result;
-    document.getElementById("uploaded-image").hidden;
+    document.getElementById("uploaded-image").hidden = true;
   };
+
   reader.readAsDataURL(file);
 });
 
-/**
- * Save the canvas image data and other information.
- */
 const saveImage = () => {
-  const imageData = canvas.toDataURL();
   const rectInfo = {
-    rectangle: {
-      color: colorInput.value, // Change color value to the selected color
-      width: selectionRect.width,
-      height: selectionRect.height,
-      x: selectionRect.x,
-      y: selectionRect.y,
-    },
-    text: {
-      color: textColor,
-      width: currentText ? ctx.measureText(currentText.text).width : null,
-      height: 30,
-      x: currentText ? currentText.x : null,
-      y: currentText ? currentText.y : null,
-    },
+    rectangles: rectangles.map((rect) => ({
+      width: rect.width,
+      height: rect.height,
+      x: rect.x,
+      y: rect.y,
+      color: rect.color,
+    })),
+    textObjects: textObjects.map((textObj) => ({
+      text: textObj.text,
+      x: textObj.x,
+      y: textObj.y,
+      color: textObj.color,
+    })),
   };
+
   console.log(JSON.stringify(rectInfo));
 };
 
-const canvasInfo = {
-  canvasWidth: canvas.width,
-  canvasHeight: canvas.height,
-  contextProperties: {
-    fillStyle: ctx.fillStyle,
-    strokeStyle: ctx.strokeStyle,
-    lineWidth: ctx.lineWidth,
-  },
-};
-
-console.log(canvasInfo);
+saveButton.addEventListener("click", saveImage);
