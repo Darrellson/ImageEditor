@@ -1,9 +1,12 @@
 canvas {
   border: 1px solid #ccc;
-  cursor: crosshair;
+  cursor: auto;
   max-width: 100%;
 }
 
 .container {
   text-align: center;
+}
+#textInputBox {
+  margin-top: 10px;
 }

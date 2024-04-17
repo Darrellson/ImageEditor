@@ -17,19 +17,26 @@
             <canvas id="imageCanvas"></canvas>
         </div>
         <button class="btn btn-primary mt-3" onclick="drawRectangle()">Draw Rectangle</button>
-        <input type="text" id="textInput" class="form-control mt-3" placeholder="Enter text...">
-        <button class="btn btn-primary mt-3" onclick="addText()">Add Text</button>
+
+        <div id="textInputBox" style="display: none;">
+            <input type="text" id="textInput" class="form-control mt-3" placeholder="Enter text...">
+        </div>
+
+        <button class="btn btn-primary mt-3" onclick="addText()">Open Add Text</button>
+        <button class="btn btn-primary mt-3" onclick="writeText()">Write Text</button>
 
         <div>
             <p>Rectangle color</p>
-            <input type="color" id="rectangleColorPicker" onchange="changeRectangleColor(this.value)" value="red">
+            <input type="color" id="rectangleColorPicker" onchange="changeRectangleColor(this.value)" value="black">
         </div>
         <div>
             <p>Text color</p>
             <input type="color" id="textColorPicker" onchange="changeTextColor(this.value)" value="black">
         </div>
-
+    
         <button class="btn btn-success mt-3" onclick="saveInfo()">Save</button>
+        <button class="btn btn-danger mt-3" onclick="clearAndReload()">Clear</button>
+
     </div>
 
     <script src="script.js"></script>

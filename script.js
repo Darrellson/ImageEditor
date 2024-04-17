@@ -1,22 +1,20 @@
-let canvas = document.getElementById("imageCanvas");
-let ctx = canvas.getContext("2d");
-let img = new Image();
+const canvas = document.getElementById("imageCanvas");
+const ctx = canvas.getContext("2d");
+const img = new Image();
 let isDrawingRectangle = false;
 let startX, startY;
+let currentX, currentY;
 let textX, textY;
-let rectangleWidth = 100;
-let rectangleHeight = 50;
-let rectangleColor = "red";
+let rectangleColor = "black";
 let textColor = "black";
+let rectangleWidth = 0;
+let rectangleHeight = 0;
 
-/**
- * Function to handle file upload and load the image onto the canvas.
- * @param {Event} event - The change event triggered by file upload.
- */
+// Function to handle file upload and load the image onto the canvas
 document.getElementById("uploadInput").addEventListener("change", (event) => {
-  let file = event.target.files[0];
+  const file = event.target.files[0];
   if (file) {
-    let reader = new FileReader();
+    const reader = new FileReader();
     reader.onload = (e) => {
       img.onload = () => {
         canvas.width = img.width;
@@ -29,81 +27,122 @@ document.getElementById("uploadInput").addEventListener("change", (event) => {
   }
 });
 
-/**
- * Function to enable drawing mode for rectangles.
- */
+// Function to enable drawing mode for rectangles
 const drawRectangle = () => {
   isDrawingRectangle = true;
 };
 
 /**
- * Function to add text at the selected position on the canvas.
+ * Displays a text input box to allow the user to input text onto the canvas.
  */
 const addText = () => {
-  let text = document.getElementById("textInput").value;
-  ctx.font = "20px Arial";
-  ctx.fillStyle = textColor;
-  ctx.fillText(text, textX, textY);
+  document.getElementById("textInputBox").style.display = "block";
+  const inputField = document.getElementById("textInput");
+  inputField.focus();
+  inputField.addEventListener("blur", () => {
+    document.getElementById("textInputBox").style.display = "none";
+  });
 };
 
 /**
- * Event listener for mouse click on the canvas.
- * Handles drawing of rectangles or capturing text position based on current mode.
- * @param {MouseEvent} event - The mouse event object.
+ * Writes the entered text onto the canvas at the specified position.
  */
+const writeText = () => {
+  const text = document.getElementById("textInput").value.trim();
+  if (text !== "") {
+    ctx.font = "20px Arial";
+    ctx.fillStyle = textColor;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText(text, textX, textY);
+  }
+};
+
+// Event listener for mouse down on the canvas
 canvas.addEventListener("mousedown", (event) => {
   if (isDrawingRectangle) {
     startX = event.offsetX;
     startY = event.offsetY;
-
+    rectangleWidth = 0;
+    rectangleHeight = 0;
     ctx.strokeStyle = rectangleColor;
     ctx.lineWidth = 3;
     ctx.strokeRect(startX, startY, rectangleWidth, rectangleHeight);
     isDrawingRectangle = false;
+    canvas.style.cursor = "auto";
   } else {
     textX = event.offsetX;
     textY = event.offsetY;
+    canvas.style.cursor = "auto";
   }
 });
 
+// Event listener for mouse move on the canvas
+canvas.addEventListener("mousemove", (event) => {
+  if (isDrawingRectangle) {
+    currentX = event.offsetX;
+    currentY = event.offsetY;
+    rectangleWidth = currentX - startX;
+    rectangleHeight = currentY - startY;
+    draw();
+  }
+});
+
+// Event listener for mouse up on the canvas
+canvas.addEventListener("mouseup", () => {
+  isDrawingRectangle = false;
+});
+
+// Function to draw the canvas with the image and rectangle
+const draw = () => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(img, 0, 0, img.width, img.height);
+  ctx.strokeStyle = rectangleColor;
+  ctx.lineWidth = 3;
+  ctx.strokeRect(startX, startY, rectangleWidth, rectangleHeight);
+};
+
 /**
- * Function to update the color of the rectangle based on user selection.
- * @param {string} color - The color value selected by the user.
+ * Updates the color of the rectangle.
+ * @param {string} color - The color to set for the rectangle.
  */
 const changeRectangleColor = (color) => {
   rectangleColor = color;
 };
 
 /**
- * Function to update the color of the text based on user selection.
- * @param {string} color - The color value selected by the user.
+ * Updates the color of the text.
+ * @param {string} color - The color to set for the text.
  */
 const changeTextColor = (color) => {
   textColor = color;
 };
 
 /**
- * Function to save information about the drawn shapes as an object.
+ * Saves information about the drawn shapes (e.g., rectangle and text).
  * @returns {Object} An object containing information about the drawn shapes.
  */
 const saveInfo = () => {
-  let rectangleInfo = {
+  const rectangleInfo = {
     type: "rectangle",
     color: rectangleColor,
     position: { x: startX, y: startY },
-    width: rectangleWidth,
-    height: rectangleHeight,
+    width: Math.abs(rectangleWidth),
+    height: Math.abs(rectangleHeight),
   };
-
-  let textInfo = {
+  const textInfo = {
     type: "text",
     color: textColor,
     position: { x: textX, y: textY },
   };
-
   return { shapes: [rectangleInfo, textInfo] };
 };
 
-let shapesInfo = saveInfo();
+// Function to clear the canvas and reload the page
+const clearAndReload = () => {
+  location.reload();
+};
 
+// Log shapes information to the console
+const shapesInfo = saveInfo();
 console.log(shapesInfo.shapes);
