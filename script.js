@@ -7,6 +7,7 @@ let currentX, currentY;
 let textX, textY;
 let rectangleColor = "black";
 let textColor = "black";
+let rectangleFillColor = "black";
 let rectangleWidth = 0;
 let rectangleHeight = 0;
 
@@ -17,9 +18,16 @@ document.getElementById("uploadInput").addEventListener("change", (event) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       img.onload = () => {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0, img.width, img.height);
+        const scale = Math.min(
+          canvas.width / img.width,
+          canvas.height / img.height
+        );
+        const newWidth = img.width * scale;
+        const newHeight = img.height * scale;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, newWidth, newHeight);
+        rectangleWidth = 0;
+        rectangleHeight = 0;
       };
       img.src = e.target.result;
     };
@@ -67,9 +75,7 @@ canvas.addEventListener("mousedown", (event) => {
     rectangleHeight = 0;
     ctx.strokeStyle = rectangleColor;
     ctx.lineWidth = 3;
-    ctx.strokeRect(startX, startY, rectangleWidth, rectangleHeight);
-    isDrawingRectangle = false;
-    canvas.style.cursor = "auto";
+    canvas.style.cursor = "crosshair";
   } else {
     textX = event.offsetX;
     textY = event.offsetY;
@@ -96,18 +102,33 @@ canvas.addEventListener("mouseup", () => {
 // Function to draw the canvas with the image and rectangle
 const draw = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(img, 0, 0, img.width, img.height);
-  ctx.strokeStyle = rectangleColor;
-  ctx.lineWidth = 3;
-  ctx.strokeRect(startX, startY, rectangleWidth, rectangleHeight);
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+  if (isDrawingRectangle) {
+    ctx.strokeStyle = rectangleColor;
+    ctx.lineWidth = 3;
+    ctx.fillStyle = rectangleFillColor;
+    ctx.fillRect(startX, startY, rectangleWidth, rectangleHeight);
+    ctx.strokeRect(startX, startY, rectangleWidth, rectangleHeight);
+  }
 };
 
 /**
- * Updates the color of the rectangle.
- * @param {string} color - The color to set for the rectangle.
+ * Updates the color of the rectangle border.
+ * @param {string} color - The color to set for the rectangle border.
  */
 const changeRectangleColor = (color) => {
   rectangleColor = color;
+  draw();
+};
+
+/**
+ * Updates the color of the rectangle fill.
+ * @param {string} color - The color to set for the rectangle fill.
+ */
+const changeRectangleFillColor = (color) => {
+  rectangleFillColor = color;
+  draw();
 };
 
 /**

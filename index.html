@@ -14,7 +14,7 @@
         <h2>Image Editor</h2>
         <input type="file" id="uploadInput" accept="image/*">
         <div>
-            <canvas id="imageCanvas"></canvas>
+            <canvas id="imageCanvas" width="800" height="600"></canvas>
         </div>
         <button class="btn btn-primary mt-3" onclick="drawRectangle()">Draw Rectangle</button>
 
@@ -26,16 +26,20 @@
         <button class="btn btn-primary mt-3" onclick="writeText()">Write Text</button>
 
         <div>
-            <p>Rectangle color</p>
+            <p>Rectangle border color</p>
             <input type="color" id="rectangleColorPicker" onchange="changeRectangleColor(this.value)" value="black">
+            <hr>
+            <p>Rectangle background color</p>
+            <input type="color" id="rectangleFillColorPicker" onchange="changeRectangleFillColor(this.value)" value="black">
         </div>
+        <hr>
         <div>
             <p>Text color</p>
             <input type="color" id="textColorPicker" onchange="changeTextColor(this.value)" value="black">
         </div>
-    
         <button class="btn btn-success mt-3" onclick="saveInfo()">Save</button>
         <button class="btn btn-danger mt-3" onclick="clearAndReload()">Clear</button>
+        
 
     </div>
 
