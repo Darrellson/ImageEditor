@@ -23,9 +23,9 @@ document.getElementById("uploadInput").addEventListener("change", (event) => {
         canvas.height = img.height;
         drawCanvas();
       };
-      img.src = e.target.result; 
+      img.src = e.target.result;
     };
-    reader.readAsDataURL(file); 
+    reader.readAsDataURL(file);
   }
 });
 
@@ -136,6 +136,14 @@ const saveRectangle = () => {
 const addText = () => {
   textInputActive = true;
   document.getElementById("textInputBox").style.display = "block";
+  canvas.addEventListener(
+    "click",
+    (event) => {
+      clickX = event.offsetX;
+      clickY = event.offsetY;
+    },
+    { once: true }
+  );
 };
 
 /**
@@ -153,7 +161,7 @@ const writeText = () => {
       size: 24,
     };
     texts.push(newText);
-    textInput.value = ""; // Clear input field
+    textInput.value = "";
     textInputActive = false;
     document.getElementById("textInputBox").style.display = "none";
     drawCanvas();
