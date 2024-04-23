@@ -12,6 +12,23 @@ let rectangleFillColor = "transparent";
 let textColor = "black";
 let textInputActive = false;
 
+// Event listener for file upload
+document.getElementById("uploadInput").addEventListener("change", (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        drawCanvas();
+      };
+      img.src = e.target.result; 
+    };
+    reader.readAsDataURL(file); 
+  }
+});
+
 /**
  * Draw the canvas with the loaded image, existing rectangles, and texts.
  * This function is called whenever changes are made to the canvas.
