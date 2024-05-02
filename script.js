@@ -5,7 +5,8 @@ let canvas,
   context,
   dragging = false,
   dragStartLocation,
-  snapshot;
+  snapshot,
+  imageUploaded = false;
 
 let shapes = [];
 
@@ -60,10 +61,13 @@ const handleImageUpload = () => {
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
+          // Set the flag to indicate that an image has been uploaded
+          imageUploaded = true;
+
           // Clear canvas and draw the uploaded image
           context.clearRect(0, 0, canvas.width, canvas.height);
           context.drawImage(img, 0, 0, canvas.width, canvas.height);
-          
+
           // Redraw shapes on top of the image
           redrawShapes();
         };
@@ -74,6 +78,7 @@ const handleImageUpload = () => {
   };
   input.click(); // Open the file dialog
 };
+
 
 
 /**
@@ -188,6 +193,10 @@ const draw = (position) => {
 
   context.lineCap = lineCap;
 
+  if (imageUploaded) {
+    redrawImage();
+  }
+
   context.beginPath();
   if (shapeType === "line") {
     context.moveTo(dragStartLocation.x, dragStartLocation.y);
@@ -256,6 +265,9 @@ const draw = (position) => {
 const redrawShapes = () => {
   shapes.forEach((shape) => {
     context.beginPath();
+    if (imageUploaded) {
+      redrawImage();
+    }
     if (shape.type === "line") {
       context.moveTo(shape.start.x, shape.start.y);
       context.lineTo(shape.end.x, shape.end.y);
@@ -293,6 +305,17 @@ const redrawShapes = () => {
       context.stroke();
     }
   });
+};
+
+/**
+ * Redraw the uploaded image on the canvas.
+ */
+const redrawImage = () => {
+  // Retrieve the uploaded image from the shapes array
+  const img = shapes.find((shape) => shape.type === "image");
+  if (img) {
+    context.drawImage(img.image, 0, 0, canvas.width, canvas.height);
+  }
 };
 
 /**
