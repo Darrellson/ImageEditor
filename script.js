@@ -63,6 +63,9 @@ const handleImageUpload = () => {
           // Clear canvas and draw the uploaded image
           context.clearRect(0, 0, canvas.width, canvas.height);
           context.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          // Redraw shapes on top of the image
+          redrawShapes();
         };
         img.src = e.target.result;
       };
@@ -71,6 +74,7 @@ const handleImageUpload = () => {
   };
   input.click(); // Open the file dialog
 };
+
 
 /**
  * Get canvas coordinates based on mouse event.
@@ -102,29 +106,15 @@ const dragStart = (event) => {
   dragging = true;
   dragStartLocation = getCanvasCoordinates(event);
 
-  // Check if the mouse is clicked on any shape
-  let clickedShape = shapes.find(shape => {
+  let clickedShape = shapes.find((shape) => {
     if (shape.type === "line") {
-      return (
-        isPointOnLine(
-          dragStartLocation,
-          shape.start,
-          shape.end,
-          context.lineWidth
-        )
-      );
+      // Check for line click
     } else if (shape.type === "circle") {
-      let radius = Math.sqrt(
-        (shape.start.x - shape.end.x) ** 2 +
-          (shape.start.y - shape.end.y) ** 2
-      );
-      return isPointInCircle(dragStartLocation, shape.start, radius);
+      // Check for circle click
     } else if (shape.type === "ellipse") {
-      // Assuming you have an isPointInEllipse function
-      // return isPointInEllipse(dragStartLocation, shape.start, shape.end);
+      // Check for ellipse click
     } else if (shape.type === "rect") {
-      // Assuming you have an isPointInRect function
-      // return isPointInRect(dragStartLocation, shape.start, shape.end);
+      return isPointInRect(dragStartLocation, shape.start, shape.end);
     }
     // Add similar checks for other shape types
   });
@@ -135,7 +125,7 @@ const dragStart = (event) => {
     // Set the offset from the top-left corner of the shape to the mouse position
     dragOffset = {
       x: dragStartLocation.x - clickedShape.start.x,
-      y: dragStartLocation.y - clickedShape.start.y
+      y: dragStartLocation.y - clickedShape.start.y,
     };
   } else {
     // If not clicked on any shape, take a snapshot of the canvas state
@@ -180,7 +170,6 @@ const dragStop = () => {
     snapshot = null;
   }
 };
-
 
 /**
  * Draw shapes based on selected shape and properties.
@@ -292,7 +281,6 @@ const redrawShapes = () => {
       let h = shape.end.y - shape.start.y;
       context.rect(shape.start.x, shape.start.y, w, h);
     } else if (shape.type === "polygon") {
-      
     }
 
     context.lineCap = shape.lineCap;
@@ -331,8 +319,16 @@ const isPointInEllipse = (point, center, radius) => {
 /**
  * Function to check if a point is inside a rectangle.
  */
+/**
+ * Function to check if a point is inside a rectangle.
+ */
 const isPointInRect = (point, topLeft, bottomRight) => {
-  // Implementation depends on your requirements
+  return (
+    point.x >= topLeft.x &&
+    point.x <= bottomRight.x &&
+    point.y >= topLeft.y &&
+    point.y <= bottomRight.y
+  );
 };
 
 // Redraw both canvas and shapes
