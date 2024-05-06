@@ -5,10 +5,7 @@ let canvas,
   context,
   dragging = false,
   dragStartLocation,
-  snapshot,
-  imageUploaded = false;
-
-let shapes = [];
+  snapshot;
 
 const init = () => {
   // Get canvas element and 2d rendering context
@@ -61,15 +58,9 @@ const handleImageUpload = () => {
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          // Set the flag to indicate that an image has been uploaded
-          imageUploaded = true;
-
           // Clear canvas and draw the uploaded image
           context.clearRect(0, 0, canvas.width, canvas.height);
           context.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          // Redraw shapes on top of the image
-          redrawShapes();
         };
         img.src = e.target.result;
       };
@@ -78,8 +69,6 @@ const handleImageUpload = () => {
   };
   input.click(); // Open the file dialog
 };
-
-
 
 /**
  * Get canvas coordinates based on mouse event.
@@ -110,32 +99,7 @@ const restoreSnapShot = () => {
 const dragStart = (event) => {
   dragging = true;
   dragStartLocation = getCanvasCoordinates(event);
-
-  let clickedShape = shapes.find((shape) => {
-    if (shape.type === "line") {
-      // Check for line click
-    } else if (shape.type === "circle") {
-      // Check for circle click
-    } else if (shape.type === "ellipse") {
-      // Check for ellipse click
-    } else if (shape.type === "rect") {
-      return isPointInRect(dragStartLocation, shape.start, shape.end);
-    }
-    // Add similar checks for other shape types
-  });
-
-  if (clickedShape) {
-    // If clicked on a shape, set draggingShape to that shape
-    draggingShape = clickedShape;
-    // Set the offset from the top-left corner of the shape to the mouse position
-    dragOffset = {
-      x: dragStartLocation.x - clickedShape.start.x,
-      y: dragStartLocation.y - clickedShape.start.y,
-    };
-  } else {
-    // If not clicked on any shape, take a snapshot of the canvas state
-    takeSnapShot();
-  }
+  takeSnapShot();
 };
 
 /**
@@ -143,44 +107,26 @@ const dragStart = (event) => {
  */
 const drag = (event) => {
   if (dragging) {
-    if (draggingShape) {
-      // If dragging a shape, update its position
-      let position = getCanvasCoordinates(event);
-      draggingShape.start.x = position.x - dragOffset.x;
-      draggingShape.start.y = position.y - dragOffset.y;
-      redrawCanvas();
-      redrawShapes();
-    } else {
-      // If not dragging a shape, restore the canvas state and draw the shape being dragged
-      restoreSnapShot();
-      let position = getCanvasCoordinates(event);
-      draw(position);
-    }
+    restoreSnapShot();
+    let position = getCanvasCoordinates(event);
+    draw(position);
   }
 };
 
 /**
  * Handle mouse up event to stop dragging.
  */
-const dragStop = () => {
+const dragStop = (event) => {
   dragging = false;
-  if (draggingShape) {
-    // If dragging a shape, clear draggingShape to stop dragging it
-    draggingShape = null;
-  } else {
-    // If not dragging a shape, save the drawn shape to the shapes array
-    let position = getCanvasCoordinates(event);
-    draw(position);
-    // Clear the snapshot
-    snapshot = null;
-  }
+  let position = getCanvasCoordinates(event);
+  draw(position);
 };
 
 /**
  * Draw shapes based on selected shape and properties.
  */
 const draw = (position) => {
-  let shapeType = document.querySelector(
+  let shape = document.querySelector(
     'input[type="radio"][name="shape"]:checked'
   ).value;
   let polygonSides = document.getElementById("polygonSides").value;
@@ -193,15 +139,11 @@ const draw = (position) => {
 
   context.lineCap = lineCap;
 
-  if (imageUploaded) {
-    redrawImage();
-  }
-
   context.beginPath();
-  if (shapeType === "line") {
+  if (shape === "line") {
     context.moveTo(dragStartLocation.x, dragStartLocation.y);
     context.lineTo(position.x, position.y);
-  } else if (shapeType === "circle") {
+  } else if (shape === "circle") {
     let radius = Math.sqrt(
       (dragStartLocation.x - position.x) ** 2 +
         (dragStartLocation.y - position.y) ** 2
@@ -213,7 +155,7 @@ const draw = (position) => {
       0,
       2 * Math.PI
     );
-  } else if (shapeType === "ellipse") {
+  } else if (shape === "ellipse") {
     let w = position.x - dragStartLocation.x;
     let h = position.y - dragStartLocation.y;
     context.ellipse(
@@ -225,11 +167,11 @@ const draw = (position) => {
       0,
       2 * Math.PI
     );
-  } else if (shapeType === "rect") {
+  } else if (shape === "rect") {
     let w = position.x - dragStartLocation.x;
     let h = position.y - dragStartLocation.y;
     context.rect(dragStartLocation.x, dragStartLocation.y, w, h);
-  } else if (shapeType === "polygon") {
+  } else if (shape === "polygon") {
     drawPolygon(position, polygonSides, polygonAngle * (Math.PI / 180));
   }
 
@@ -246,122 +188,7 @@ const draw = (position) => {
     context.strokeStyle = document.getElementById("strokeColor").value;
     context.stroke();
   }
-
-  // Save drawn shape to the shapes array
-  shapes.push({
-    type: shapeType,
-    start: { x: dragStartLocation.x, y: dragStartLocation.y },
-    end: { x: position.x, y: position.y },
-    fill: fillBox.checked,
-    fillColor: context.fillStyle,
-    strokeColor: context.strokeStyle,
-    lineCap: lineCap,
-  });
 };
-
-/**
- * Draw all shapes stored in the shapes array.
- */
-const redrawShapes = () => {
-  shapes.forEach((shape) => {
-    context.beginPath();
-    if (imageUploaded) {
-      redrawImage();
-    }
-    if (shape.type === "line") {
-      context.moveTo(shape.start.x, shape.start.y);
-      context.lineTo(shape.end.x, shape.end.y);
-    } else if (shape.type === "circle") {
-      let radius = Math.sqrt(
-        (shape.start.x - shape.end.x) ** 2 + (shape.start.y - shape.end.y) ** 2
-      );
-      context.arc(shape.start.x, shape.start.y, radius, 0, 2 * Math.PI);
-    } else if (shape.type === "ellipse") {
-      let w = shape.end.x - shape.start.x;
-      let h = shape.end.y - shape.start.y;
-      context.ellipse(
-        shape.start.x,
-        shape.start.y,
-        Math.abs(w),
-        Math.abs(h),
-        0,
-        0,
-        2 * Math.PI
-      );
-    } else if (shape.type === "rect") {
-      let w = shape.end.x - shape.start.x;
-      let h = shape.end.y - shape.start.y;
-      context.rect(shape.start.x, shape.start.y, w, h);
-    } else if (shape.type === "polygon") {
-    }
-
-    context.lineCap = shape.lineCap;
-
-    if (shape.fill) {
-      context.fillStyle = shape.fillColor;
-      context.fill();
-    } else {
-      context.strokeStyle = shape.strokeColor;
-      context.stroke();
-    }
-  });
-};
-
-/**
- * Redraw the uploaded image on the canvas.
- */
-const redrawImage = () => {
-  // Retrieve the uploaded image from the shapes array
-  const img = shapes.find((shape) => shape.type === "image");
-  if (img) {
-    context.drawImage(img.image, 0, 0, canvas.width, canvas.height);
-  }
-};
-
-/**
- * Function to check if a point is on a line segment.
- */
-const isPointOnLine = (point, start, end, lineWidth) => {
-  // Implementation depends on your requirements
-};
-
-/**
- * Function to check if a point is inside a circle.
- */
-const isPointInCircle = (point, center, radius) => {
-  // Implementation depends on your requirements
-};
-
-/**
- * Function to check if a point is inside an ellipse.
- */
-const isPointInEllipse = (point, center, radius) => {
-  // Implementation depends on your requirements
-};
-
-/**
- * Function to check if a point is inside a rectangle.
- */
-/**
- * Function to check if a point is inside a rectangle.
- */
-const isPointInRect = (point, topLeft, bottomRight) => {
-  return (
-    point.x >= topLeft.x &&
-    point.x <= bottomRight.x &&
-    point.y >= topLeft.y &&
-    point.y <= bottomRight.y
-  );
-};
-
-// Redraw both canvas and shapes
-const redrawCanvas = () => {
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  redrawShapes();
-};
-
-// Initialize canvas drawing app after the window has loaded
-window.addEventListener("load", init);
 
 /**
  * Calculate angle between two points.
