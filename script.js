@@ -16,7 +16,6 @@ const init = () => {
   canvas.addEventListener("mousedown", dragStart, false);
   canvas.addEventListener("mousemove", drag, false);
   canvas.addEventListener("mouseup", dragStop, false);
-  canvas.addEventListener("click", selectRect); // Add event listener for rectangle selection
 
   // Get DOM elements related to canvas properties
   let lineWidth = document.getElementById("lineWidth");
@@ -123,85 +122,9 @@ const dragStop = (event) => {
   draw(position);
 };
 
-let rectData = [];
-
-// /**
-//  * Draw shapes based on selected shape and properties.
-//  */
-// const draw = (position) => {
-//   let shape = document.querySelector(
-//     'input[type="radio"][name="shape"]:checked'
-//   ).value;
-//   let polygonSides = document.getElementById("polygonSides").value;
-//   let polygonAngle = calculateAngle(dragStartLocation, position);
-//   let lineCap = document.querySelector(
-//     'input[type="radio"][name="lineCap"]:checked'
-//   ).value;
-//   let fillBox = document.getElementById("fillBox");
-//   let xor = document.getElementById("xor");
-
-//   context.lineCap = lineCap;
-
-//   context.beginPath();
-//   if (shape === "line") {
-//     context.moveTo(dragStartLocation.x, dragStartLocation.y);
-//     context.lineTo(position.x, position.y);
-//   } else if (shape === "circle") {
-//     let radius = Math.sqrt(
-//       (dragStartLocation.x - position.x) ** 2 +
-//         (dragStartLocation.y - position.y) ** 2
-//     );
-//     context.arc(
-//       dragStartLocation.x,
-//       dragStartLocation.y,
-//       radius,
-//       0,
-//       2 * Math.PI
-//     );
-//   } else if (shape === "ellipse") {
-//     let w = position.x - dragStartLocation.x;
-//     let h = position.y - dragStartLocation.y;
-//     context.ellipse(
-//       dragStartLocation.x,
-//       dragStartLocation.y,
-//       Math.abs(w),
-//       Math.abs(h),
-//       0,
-//       0,
-//       2 * Math.PI
-//     );
-//   } else if (shape === "rect") {
-//     let w = position.x - dragStartLocation.x;
-//     let h = position.y - dragStartLocation.y;
-//     let rect = {
-//       x: dragStartLocation.x,
-//       y: dragStartLocation.y,
-//       width: w,
-//       height: h,
-//       selected: false, // Initialize the selection status as false
-//     };
-//     rectData.push(rect); // Store the rectangle in rectData
-//   } else if (shape === "polygon") {
-//     drawPolygon(position, polygonSides, polygonAngle * (Math.PI / 180));
-//   }
-
-//   if (xor.checked) {
-//     context.globalCompositeOperation = "xor";
-//   } else {
-//     context.globalCompositeOperation = "source-over";
-//   }
-
-//   if (fillBox.checked) {
-//     context.fillStyle = document.getElementById("fillColor").value;
-//     context.fill();
-//   } else {
-//     context.strokeStyle = document.getElementById("strokeColor").value;
-//     context.stroke();
-//   }
-
-//   drawSelectedRects(); // Draw selected rectangles with gray stroke color
-// };
-
+/**
+ * Draw shapes based on selected shape and properties.
+ */
 const draw = (position) => {
   let shape = document.querySelector(
     'input[type="radio"][name="shape"]:checked'
@@ -216,118 +139,55 @@ const draw = (position) => {
 
   context.lineCap = lineCap;
 
-  context.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+  context.beginPath();
+  if (shape === "line") {
+    context.moveTo(dragStartLocation.x, dragStartLocation.y);
+    context.lineTo(position.x, position.y);
+  } else if (shape === "circle") {
+    let radius = Math.sqrt(
+      (dragStartLocation.x - position.x) ** 2 +
+        (dragStartLocation.y - position.y) ** 2
+    );
+    context.arc(
+      dragStartLocation.x,
+      dragStartLocation.y,
+      radius,
+      0,
+      2 * Math.PI
+    );
+  } else if (shape === "ellipse") {
+    let w = position.x - dragStartLocation.x;
+    let h = position.y - dragStartLocation.y;
+    context.ellipse(
+      dragStartLocation.x,
+      dragStartLocation.y,
+      Math.abs(w),
+      Math.abs(h),
+      0,
+      0,
+      2 * Math.PI
+    );
+  } else if (shape === "rect") {
+    let w = position.x - dragStartLocation.x;
+    let h = position.y - dragStartLocation.y;
+    context.rect(dragStartLocation.x, dragStartLocation.y, w, h);
+  } else if (shape === "polygon") {
+    drawPolygon(position, polygonSides, polygonAngle * (Math.PI / 180));
+  }
 
-  // Draw the image
-  const img = new Image();
-  img.onload = () => {
-    context.drawImage(img, 0, 0, canvas.width, canvas.height);
-    
-    // Draw shapes on top of the image
-    context.beginPath();
-    if (shape === "line") {
-      context.moveTo(dragStartLocation.x, dragStartLocation.y);
-      context.lineTo(position.x, position.y);
-    } else if (shape === "circle") {
-      let radius = Math.sqrt(
-        (dragStartLocation.x - position.x) ** 2 +
-          (dragStartLocation.y - position.y) ** 2
-      );
-      context.arc(
-        dragStartLocation.x,
-        dragStartLocation.y,
-        radius,
-        0,
-        2 * Math.PI
-      );
-    } else if (shape === "ellipse") {
-      let w = position.x - dragStartLocation.x;
-      let h = position.y - dragStartLocation.y;
-      context.ellipse(
-        dragStartLocation.x,
-        dragStartLocation.y,
-        Math.abs(w),
-        Math.abs(h),
-        0,
-        0,
-        2 * Math.PI
-      );
-    } else if (shape === "rect") {
-      let w = position.x - dragStartLocation.x;
-      let h = position.y - dragStartLocation.y;
-      let rect = {
-        x: dragStartLocation.x,
-        y: dragStartLocation.y,
-        width: w,
-        height: h,
-        selected: false, // Initialize the selection status as false
-      };
-      rectData.push(rect); // Store the rectangle in rectData
-    } else if (shape === "polygon") {
-      drawPolygon(position, polygonSides, polygonAngle * (Math.PI / 180));
-    }
+  if (xor.checked) {
+    context.globalCompositeOperation = "xor";
+  } else {
+    context.globalCompositeOperation = "source-over";
+  }
 
-    if (xor.checked) {
-      context.globalCompositeOperation = "xor";
-    } else {
-      context.globalCompositeOperation = "source-over";
-    }
-
-    if (fillBox.checked) {
-      context.fillStyle = document.getElementById("fillColor").value;
-      context.fill();
-    } else {
-      context.strokeStyle = document.getElementById("strokeColor").value;
-      context.stroke();
-    }
-
-    drawSelectedRects(); // Draw selected rectangles with gray stroke color
-  };
-  img.src = canvas.toDataURL(); // Redraw the image
-};
-
-
-/**
- * Check if the mouse click occurs within the boundaries of a rectangle.
- */
-const isInsideRect = (rect, mouseX, mouseY) => {
-  return (
-    mouseX > rect.x &&
-    mouseX < rect.x + rect.width &&
-    mouseY > rect.y &&
-    mouseY < rect.y + rect.height
-  );
-};
-
-/**
- * Select a rectangle based on mouse click.
- */
-const selectRect = (event) => {
-  const mouseX = event.clientX - canvas.getBoundingClientRect().left;
-  const mouseY = event.clientY - canvas.getBoundingClientRect().top;
-  rectData.forEach((rect) => {
-    if (isInsideRect(rect, mouseX, mouseY)) {
-      // Toggle selection status
-      rect.selected = !rect.selected;
-    }
-  });
-  drawSelectedRects(); // Redraw canvas including selected rectangles
-};
-
-/**
- * Draw selected rectangles with gray stroke color.
- */
-const drawSelectedRects = () => {
-  context.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-  rectData.forEach((rect) => {
-    if (rect.selected) {
-      // Draw selected rectangle with gray stroke color
-      context.strokeStyle = "gray";
-    } else {
-      context.strokeStyle = document.getElementById("strokeColor").value;
-    }
-    context.strokeRect(rect.x, rect.y, rect.width, rect.height);
-  });
+  if (fillBox.checked) {
+    context.fillStyle = document.getElementById("fillColor").value;
+    context.fill();
+  } else {
+    context.strokeStyle = document.getElementById("strokeColor").value;
+    context.stroke();
+  }
 };
 
 /**
