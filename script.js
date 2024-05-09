@@ -243,8 +243,13 @@ const draw = (position) => {
  */
 const drawOnImage = (position) => {
   // Redraw the uploaded image
+  context.clearRect(0, 0, canvas.width, canvas.height);
   context.drawImage(imageUploaded, 0, 0, canvas.width, canvas.height);
-
+  
+  // Redraw existing objects on top of the image
+  redrawObjects();
+  
+  // Draw new shape based on user input
   let shape = document.querySelector(
     'input[type="radio"][name="shape"]:checked'
   ).value;
@@ -308,7 +313,6 @@ const drawOnImage = (position) => {
     context.stroke();
   }
 };
-
 
 const redrawObjects = () => {
   context.clearRect(0, 0, canvas.width, canvas.height);
