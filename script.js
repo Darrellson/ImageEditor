@@ -1,19 +1,18 @@
 const canvas = new fabric.Canvas("canvas");
 canvas.selection = false;
-let rect,
-  ellipse,
-  line,
-  isDown,
-  origX,
-  origY,
-  freeDrawing = true,
-  textVal,
-  activeObj;
-let isRectActive = false,
-  isCircleActive = false,
-  isArrowActive = false,
-  isTextActive = false;
-
+let rect;
+let ellipse;
+let line;
+let isDown;
+let origX;
+let origY;
+let freeDrawing = true;
+let textVal;
+let activeObj;
+let isRectActive = false;
+let isCircleActive = false;
+let isArrowActive = false;
+let isTextActive = false;
 let selectedColor = "#000000"; // default color
 const rectangle = document.getElementById("rect");
 const circle = document.getElementById("circle");
@@ -21,29 +20,52 @@ const arrowSel = document.getElementById("arrow");
 const textSel = document.getElementById("text");
 const colorPicker = document.getElementById("colorPicker");
 
+/**
+ * Event listener for rectangle selection button.
+ */
 rectangle.addEventListener("click", () => {
   isRectActive = true;
   isCircleActive = false;
   isArrowActive = false;
 });
+
+/**
+ * Event listener for circle selection button.
+ */
 circle.addEventListener("click", () => {
   isRectActive = false;
   isCircleActive = true;
   isArrowActive = false;
 });
+
+/**
+ * Event listener for arrow selection button.
+ */
 arrowSel.addEventListener("click", () => {
   isRectActive = false;
   isCircleActive = false;
   isArrowActive = true;
 });
+
+/**
+ * Event listener for text selection button.
+ */
 textSel.addEventListener("click", () => {
   isTextActive = true;
 });
 
+/**
+ * Event listener for color picker change.
+ * @param {Event} e - The change event.
+ */
 colorPicker.addEventListener("change", (e) => {
   selectedColor = e.target.value;
 });
 
+/**
+ * Event listener for image loader input element change.
+ * @param {Event} e - The change event.
+ */
 document.getElementById("imageLoader").addEventListener("change", (e) => {
   const file = e.target.files[0];
   const reader = new FileReader();
@@ -66,6 +88,10 @@ document.getElementById("imageLoader").addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
+/**
+ * Event listener for mouse down on the canvas.
+ * @param {Object} o - The mouse event object.
+ */
 canvas.on("mouse:down", (o) => {
   if (freeDrawing && !isTextActive) {
     isDown = true;
@@ -109,6 +135,10 @@ canvas.on("mouse:down", (o) => {
   }
 });
 
+/**
+ * Event listener for mouse move on the canvas.
+ * @param {Object} o - The mouse event object.
+ */
 canvas.on("mouse:move", (o) => {
   if (isDown && freeDrawing && !isTextActive) {
     const pointer = canvas.getPointer(o.e);
@@ -125,6 +155,10 @@ canvas.on("mouse:move", (o) => {
   }
 });
 
+/**
+ * Event listener for mouse up on the canvas.
+ * @param {Object} o - The mouse event object.
+ */
 canvas.on("mouse:up", (o) => {
   if (freeDrawing && !isTextActive) {
     isDown = false;
