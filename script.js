@@ -7,6 +7,7 @@ let isDown;
 let origX;
 let origY;
 let freeDrawing = true;
+const freeDrawBtn = document.getElementById("freeDraw");
 let textVal;
 let activeObj;
 let isRectActive = false;
@@ -104,7 +105,7 @@ canvas.on("mouse:down", (o) => {
         top: origY,
         width: 1,
         height: 1,
-        fill: "",
+        fill: selectedColor, // Specify the fill color here
         stroke: selectedColor,
         strokeWidth: 2,
       });
@@ -115,7 +116,7 @@ canvas.on("mouse:down", (o) => {
         left: origX,
         top: origY,
         radius: 1,
-        fill: "",
+        fill: "", // Keep this empty if you want unfilled circle
         stroke: selectedColor,
         strokeWidth: 2,
       });
@@ -125,7 +126,7 @@ canvas.on("mouse:down", (o) => {
       const points = [pointer.x, pointer.y, pointer.x, pointer.y];
       line = new fabric.Line(points, {
         strokeWidth: 2,
-        fill: selectedColor,
+        fill: selectedColor, // Specify the fill color here
         stroke: selectedColor,
         type: "arrow",
       });
@@ -134,6 +135,7 @@ canvas.on("mouse:down", (o) => {
     }
   }
 });
+
 
 /**
  * Event listener for mouse move on the canvas.
@@ -169,5 +171,24 @@ canvas.on("mouse:up", (o) => {
         canvas.add(text);
       }
     }
+  }
+});
+
+/**
+ * Event listener for free draw button.
+ */
+freeDrawBtn.addEventListener("click", () => {
+  // Toggle free drawing mode
+  freeDrawing = !freeDrawing;
+  if (freeDrawing) {
+    // Enable free drawing
+    canvas.isDrawingMode = true;
+    // Disable other shape drawing modes
+    isRectActive = false;
+    isCircleActive = false;
+    isArrowActive = false;
+  } else {
+    // Disable free drawing
+    canvas.isDrawingMode = false;
   }
 });
