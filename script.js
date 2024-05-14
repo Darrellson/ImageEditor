@@ -94,7 +94,7 @@ document.getElementById("imageLoader").addEventListener("change", (e) => {
  * @param {Object} o - The mouse event object.
  */
 canvas.on("mouse:down", (o) => {
-  if (freeDrawing && !isTextActive) {
+  if (freeDrawing) {
     isDown = true;
     const pointer = canvas.getPointer(o.e);
     origX = pointer.x;
@@ -142,7 +142,7 @@ canvas.on("mouse:down", (o) => {
  * @param {Object} o - The mouse event object.
  */
 canvas.on("mouse:move", (o) => {
-  if (isDown && freeDrawing && !isTextActive) {
+  if (isDown && freeDrawing) {
     const pointer = canvas.getPointer(o.e);
     if (isRectActive) {
       rect.set({ width: Math.abs(origX - pointer.x) });
@@ -199,23 +199,22 @@ canvas.on("mouse:move", (o) => {
  * @param {Object} o - The mouse event object.
  */
 canvas.on("mouse:up", (o) => {
-  if (freeDrawing && !isTextActive) {
+  if (freeDrawing && isTextActive) {
     isDown = false;
-    if (isRectActive || isCircleActive || isArrowActive) {
-      textVal = prompt("Please enter text value..", "");
-      if (textVal && textVal.trim() !== "") {
-        const text = new fabric.Text(textVal, { left: origX, top: origY });
-        canvas.add(text);
-      }
+    const textVal = prompt("Please enter text value..", "");
+    if (textVal && textVal.trim() !== "") {
+      const text = new fabric.Text(textVal, { left: o.e.clientX, top: o.e.clientY });
+      canvas.add(text);
     }
-
+    isTextActive = false; // Reset the flag after adding text
+  }
     // Enable object selection and moving
     canvas.selection = true;
     canvas.forEachObject((obj) => {
       obj.set({ selectable: true });
     });
   }
-});
+);
 
 /**
  * Event listener for object selection on the canvas.
@@ -232,21 +231,3 @@ canvas.on("selection:cleared", () => {
 });
 
 
-/**
- * Event listener for free draw button.
- */
-freeDrawBtn.addEventListener("click", () => {
-  // Toggle free drawing mode
-  freeDrawing = !freeDrawing;
-  if (freeDrawing) {
-    // Enable free drawing
-    canvas.isDrawingMode = true;
-    // Disable other shape drawing modes
-    isRectActive = false;
-    isCircleActive = false;
-    isArrowActive = false;
-  } else {
-    // Disable free drawing
-    canvas.isDrawingMode = false;
-  }
-});
