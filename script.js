@@ -175,6 +175,64 @@ canvas.on("mouse:up", (o) => {
 });
 
 /**
+ * Event listener for mouse move on the canvas.
+ * @param {Object} o - The mouse event object.
+ */
+canvas.on("mouse:move", (o) => {
+  if (isDown && freeDrawing && !isTextActive) {
+    const pointer = canvas.getPointer(o.e);
+    if (isRectActive) {
+      rect.set({ width: Math.abs(origX - pointer.x) });
+      rect.set({ height: Math.abs(origY - pointer.y) });
+    } else if (isCircleActive) {
+      const radius = Math.abs(origX - pointer.x) / 2;
+      ellipse.set({ radius: radius });
+    } else if (isArrowActive) {
+      line.set({ x2: pointer.x, y2: pointer.y });
+    }
+    canvas.renderAll();
+  }
+});
+
+/**
+ * Event listener for mouse up on the canvas.
+ * @param {Object} o - The mouse event object.
+ */
+canvas.on("mouse:up", (o) => {
+  if (freeDrawing && !isTextActive) {
+    isDown = false;
+    if (isRectActive || isCircleActive || isArrowActive) {
+      textVal = prompt("Please enter text value..", "");
+      if (textVal && textVal.trim() !== "") {
+        const text = new fabric.Text(textVal, { left: origX, top: origY });
+        canvas.add(text);
+      }
+    }
+
+    // Enable object selection and moving
+    canvas.selection = true;
+    canvas.forEachObject((obj) => {
+      obj.set({ selectable: true });
+    });
+  }
+});
+
+/**
+ * Event listener for object selection on the canvas.
+ */
+canvas.on("selection:created", (e) => {
+  activeObj = e.target;
+});
+
+/**
+ * Event listener for object deselection on the canvas.
+ */
+canvas.on("selection:cleared", () => {
+  activeObj = null;
+});
+
+
+/**
  * Event listener for free draw button.
  */
 freeDrawBtn.addEventListener("click", () => {
