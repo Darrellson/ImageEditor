@@ -13,7 +13,7 @@ const colorPicker = document.getElementById("colorPicker");
 drawTools.forEach((tool) => {
   tool.addEventListener("click", (e) => {
     const shape = e.target.getAttribute("data-shape");
-    if (!isDrawing && !activeObject) {
+    if (shape === "rect") {
       activateDrawing(shape);
     }
   });
@@ -32,12 +32,15 @@ colorPicker.addEventListener("change", (e) => {
  * @param {string} shape - The shape to be drawn.
  */
 const activateDrawing = (shape) => {
+  canvas.isDrawingMode = false; // Disable any existing drawing mode
   canvas.off("mouse:down");
   canvas.off("mouse:move");
   canvas.off("mouse:up");
+  isDrawing = true;
 
   canvas.on("mouse:down", (o) => {
-    isDrawing = true;
+    if (!isDrawing) return;
+
     const pointer = canvas.getPointer(o.e);
     origX = pointer.x;
     origY = pointer.y;
@@ -48,7 +51,7 @@ const activateDrawing = (shape) => {
   });
 
   canvas.on("mouse:move", (o) => {
-    if (!isDrawing) return;
+    if (!isDrawing || !activeObject) return;
     const pointer = canvas.getPointer(o.e);
 
     if (shape === "rect") {
@@ -91,6 +94,12 @@ const drawRectangle = (x, y) => {
 const adjustRectangleSize = (pointer) => {
   const width = Math.abs(origX - pointer.x);
   const height = Math.abs(origY - pointer.y);
+  if (pointer.x < origX) {
+    activeObject.set({ left: pointer.x });
+  }
+  if (pointer.y < origY) {
+    activeObject.set({ top: pointer.y });
+  }
   activeObject.set({ width, height });
 };
 
