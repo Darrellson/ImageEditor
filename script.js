@@ -1,9 +1,9 @@
 const canvas = new fabric.Canvas("canvas");
-canvas.selection = true; // Enable object selection
+canvas.selection = true;
 let isDrawing = false;
 let origX, origY;
 let activeObject;
-let selectedColor = "#000000"; // default color
+let selectedColor = "#000000";
 const drawTools = document.querySelectorAll(".draw-tool");
 const colorPicker = document.getElementById("colorPicker");
 const saveButton = document.getElementById("saveButton");
@@ -33,13 +33,13 @@ colorPicker.addEventListener("change", (e) => {
  * @param {string} shape - The shape to be drawn.
  */
 const activateDrawing = (shape) => {
-  canvas.isDrawingMode = false; // Disable any existing drawing mode
+  canvas.isDrawingMode = false;
   canvas.off("mouse:down");
   canvas.off("mouse:move");
   canvas.off("mouse:up");
   isDrawing = true;
 
-  canvas.defaultCursor = 'crosshair'; // Set cursor to crosshair while drawing
+  canvas.defaultCursor = "crosshair";
 
   canvas.on("mouse:down", (o) => {
     if (!isDrawing) return;
@@ -67,7 +67,7 @@ const activateDrawing = (shape) => {
   canvas.on("mouse:up", () => {
     isDrawing = false;
     activeObject = null;
-    canvas.defaultCursor = 'default'; // Reset cursor to default after drawing
+    canvas.defaultCursor = "default";
   });
 };
 
@@ -131,12 +131,12 @@ document.getElementById("imageLoader").addEventListener("change", (e) => {
       img.set({
         left: 0,
         top: 0,
-        selectable: false, // Make the image unselectable
-        hoverCursor: 'default' // Set cursor to default when hovering over the image
+        selectable: false,
+        hoverCursor: "default",
       });
-      img.scaleToWidth(canvas.width); // Scale the image to canvas width
-      img.scaleToHeight(canvas.height); // Scale the image to canvas height
-      canvas.add(img).sendToBack(); // Add image to the canvas and send it to back
+      img.scaleToWidth(canvas.width);
+      img.scaleToHeight(canvas.height);
+      canvas.add(img).sendToBack();
       canvas.renderAll();
     });
   };
@@ -152,14 +152,14 @@ saveButton.addEventListener("click", () => {
   const rectangles = [];
 
   objects.forEach((obj) => {
-    if (obj.type === 'image') {
+    if (obj.type === "image") {
       imageInfo = {
         width: obj.width * obj.scaleX,
         height: obj.height * obj.scaleY,
         left: obj.left,
-        top: obj.top
+        top: obj.top,
       };
-    } else if (obj.type === 'rect') {
+    } else if (obj.type === "rect") {
       rectangles.push({
         width: obj.width * obj.scaleX,
         height: obj.height * obj.scaleY,
@@ -167,14 +167,14 @@ saveButton.addEventListener("click", () => {
         top: obj.top,
         fill: obj.fill,
         stroke: obj.stroke,
-        strokeWidth: obj.strokeWidth
+        strokeWidth: obj.strokeWidth,
       });
     }
   });
 
   const result = {
     image: imageInfo,
-    rectangles: rectangles
+    rectangles: rectangles,
   };
 
   console.log(result);
