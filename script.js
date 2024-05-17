@@ -6,6 +6,7 @@ let activeObject;
 let selectedColor = "#000000"; // default color
 const drawTools = document.querySelectorAll(".draw-tool");
 const colorPicker = document.getElementById("colorPicker");
+const saveButton = document.getElementById("saveButton");
 
 /**
  * Event listener for drawing tools click.
@@ -38,6 +39,8 @@ const activateDrawing = (shape) => {
   canvas.off("mouse:up");
   isDrawing = true;
 
+  canvas.defaultCursor = 'crosshair'; // Set cursor to crosshair while drawing
+
   canvas.on("mouse:down", (o) => {
     if (!isDrawing) return;
 
@@ -64,6 +67,7 @@ const activateDrawing = (shape) => {
   canvas.on("mouse:up", () => {
     isDrawing = false;
     activeObject = null;
+    canvas.defaultCursor = 'default'; // Reset cursor to default after drawing
   });
 };
 
@@ -128,6 +132,7 @@ document.getElementById("imageLoader").addEventListener("change", (e) => {
         left: 0,
         top: 0,
         selectable: false, // Make the image unselectable
+        hoverCursor: 'default' // Set cursor to default when hovering over the image
       });
       img.scaleToWidth(canvas.width); // Scale the image to canvas width
       img.scaleToHeight(canvas.height); // Scale the image to canvas height
@@ -136,4 +141,41 @@ document.getElementById("imageLoader").addEventListener("change", (e) => {
     });
   };
   reader.readAsDataURL(file);
+});
+
+/**
+ * Event listener for save button click.
+ */
+saveButton.addEventListener("click", () => {
+  const objects = canvas.getObjects();
+  let imageInfo = {};
+  const rectangles = [];
+
+  objects.forEach((obj) => {
+    if (obj.type === 'image') {
+      imageInfo = {
+        width: obj.width * obj.scaleX,
+        height: obj.height * obj.scaleY,
+        left: obj.left,
+        top: obj.top
+      };
+    } else if (obj.type === 'rect') {
+      rectangles.push({
+        width: obj.width * obj.scaleX,
+        height: obj.height * obj.scaleY,
+        left: obj.left,
+        top: obj.top,
+        fill: obj.fill,
+        stroke: obj.stroke,
+        strokeWidth: obj.strokeWidth
+      });
+    }
+  });
+
+  const result = {
+    image: imageInfo,
+    rectangles: rectangles
+  };
+
+  console.log(result);
 });
