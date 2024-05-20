@@ -132,8 +132,10 @@ const addText = (x, y) => {
 const updateSelectedShapeColor = () => {
   const activeObject = canvas.getActiveObject();
   if (activeObject) {
-    activeObject.set({ fill: selectedColor, stroke: selectedColor });
-    canvas.renderAll();
+    if (activeObject.type === "rect" || activeObject.type === "textbox") {
+      activeObject.set({ fill: selectedColor, stroke: selectedColor });
+      canvas.renderAll();
+    }
   }
 };
 
