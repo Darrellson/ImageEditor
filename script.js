@@ -25,7 +25,7 @@ drawTools.forEach((tool) => {
  */
 colorPicker.addEventListener("change", (e) => {
   selectedColor = e.target.value;
-  updateShapesColor();
+  updateSelectedShapeColor();
 });
 
 /**
@@ -127,15 +127,14 @@ const addText = (x, y) => {
 };
 
 /**
- * Updates the color of all shapes on the canvas.
+ * Updates the color of the selected shape on the canvas.
  */
-const updateShapesColor = () => {
-  canvas.getObjects().forEach((obj) => {
-    if (obj.type === "rect" || obj.type === "textbox") {
-      obj.set({ fill: selectedColor, stroke: selectedColor });
-    }
-  });
-  canvas.renderAll();
+const updateSelectedShapeColor = () => {
+  const activeObject = canvas.getActiveObject();
+  if (activeObject) {
+    activeObject.set({ fill: selectedColor, stroke: selectedColor });
+    canvas.renderAll();
+  }
 };
 
 /**
