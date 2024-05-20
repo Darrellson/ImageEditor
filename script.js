@@ -14,7 +14,7 @@ const saveButton = document.getElementById("saveButton");
 drawTools.forEach((tool) => {
   tool.addEventListener("click", (e) => {
     const shape = e.target.getAttribute("data-shape");
-    if (shape === "rect") {
+    if (shape === "rect" || shape === "text") {
       activateDrawing(shape);
     }
   });
@@ -50,6 +50,8 @@ const activateDrawing = (shape) => {
 
     if (shape === "rect") {
       drawRectangle(origX, origY);
+    } else if (shape === "text") {
+      addText(origX, origY);
     }
   });
 
@@ -108,11 +110,28 @@ const adjustRectangleSize = (pointer) => {
 };
 
 /**
+ * Adds text at the given coordinates.
+ * @param {number} x - The x-coordinate.
+ * @param {number} y - The y-coordinate.
+ */
+const addText = (x, y) => {
+  const text = new fabric.Textbox("Type here", {
+    left: x,
+    top: y,
+    fill: selectedColor,
+    fontSize: 20,
+    width: 150,
+  });
+  canvas.add(text).setActiveObject(text);
+  canvas.renderAll();
+};
+
+/**
  * Updates the color of all shapes on the canvas.
  */
 const updateShapesColor = () => {
   canvas.getObjects().forEach((obj) => {
-    if (obj.type === "rect") {
+    if (obj.type === "rect" || obj.type === "textbox") {
       obj.set({ fill: selectedColor, stroke: selectedColor });
     }
   });
@@ -150,6 +169,7 @@ saveButton.addEventListener("click", () => {
   const objects = canvas.getObjects();
   let imageInfo = {};
   const rectangles = [];
+  const texts = [];
 
   objects.forEach((obj) => {
     if (obj.type === "image") {
@@ -169,12 +189,22 @@ saveButton.addEventListener("click", () => {
         stroke: obj.stroke,
         strokeWidth: obj.strokeWidth,
       });
+    } else if (obj.type === "textbox") {
+      texts.push({
+        text: obj.text,
+        left: obj.left,
+        top: obj.top,
+        fill: obj.fill,
+        fontSize: obj.fontSize,
+        width: obj.width,
+      });
     }
   });
 
   const result = {
     image: imageInfo,
     rectangles: rectangles,
+    texts: texts,
   };
 
   console.log(result);
