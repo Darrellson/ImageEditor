@@ -8,24 +8,96 @@ const drawTools = document.querySelectorAll(".draw-tool");
 const colorPicker = document.getElementById("colorPicker");
 const saveButton = document.getElementById("saveButton");
 
-/**
- * Event listener for drawing tools click.
- */
-drawTools.forEach((tool) => {
-  tool.addEventListener("click", (e) => {
-    const shape = e.target.getAttribute("data-shape");
-    if (shape === "rect" || shape === "text") {
-      activateDrawing(shape);
-    }
+// Function to enable drawing tools and color picker
+const enableDrawingTools = () => {
+  drawTools.forEach((tool) => {
+    tool.addEventListener("click", (e) => {
+      const shape = e.target.getAttribute("data-shape");
+      if (shape === "rect" || shape === "text") {
+        activateDrawing(shape);
+      }
+    });
   });
+
+  colorPicker.addEventListener("change", (e) => {
+    selectedColor = e.target.value;
+    updateSelectedShapeColor();
+  });
+};
+
+/**
+ * Event listener for image loader input element change.
+ */
+document.getElementById("imageLoader").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = (f) => {
+    const data = f.target.result;
+    fabric.Image.fromURL(data, (img) => {
+      img.set({
+        left: 0,
+        top: 0,
+        selectable: false,
+        hoverCursor: "default",
+      });
+      img.scaleToWidth(canvas.width);
+      img.scaleToHeight(canvas.height);
+      canvas.add(img).sendToBack();
+      canvas.renderAll();
+
+      // Once image is uploaded, enable drawing tools
+      enableDrawingTools();
+    });
+  };
+  reader.readAsDataURL(file);
 });
 
 /**
- * Event listener for color picker change.
+ * Event listener for save button click.
  */
-colorPicker.addEventListener("change", (e) => {
-  selectedColor = e.target.value;
-  updateSelectedShapeColor();
+saveButton.addEventListener("click", () => {
+  const objects = canvas.getObjects();
+  let imageInfo = {};
+  const rectangles = [];
+  const texts = [];
+
+  objects.forEach((obj) => {
+    if (obj.type === "image") {
+      imageInfo = {
+        width: obj.width * obj.scaleX,
+        height: obj.height * obj.scaleY,
+        left: obj.left,
+        top: obj.top,
+      };
+    } else if (obj.type === "rect") {
+      rectangles.push({
+        width: obj.width * obj.scaleX,
+        height: obj.height * obj.scaleY,
+        left: obj.left,
+        top: obj.top,
+        fill: obj.fill,
+        stroke: obj.stroke,
+        strokeWidth: obj.strokeWidth,
+      });
+    } else if (obj.type === "textbox") {
+      texts.push({
+        text: obj.text,
+        left: obj.left,
+        top: obj.top,
+        fill: obj.fill,
+        fontSize: obj.fontSize,
+        width: obj.width,
+      });
+    }
+  });
+
+  const result = {
+    image: imageInfo,
+    rectangles: rectangles,
+    texts: texts,
+  };
+
+  console.log(result);
 });
 
 /**
@@ -138,75 +210,3 @@ const updateSelectedShapeColor = () => {
     }
   }
 };
-
-/**
- * Event listener for image loader input element change.
- */
-document.getElementById("imageLoader").addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  const reader = new FileReader();
-  reader.onload = (f) => {
-    const data = f.target.result;
-    fabric.Image.fromURL(data, (img) => {
-      img.set({
-        left: 0,
-        top: 0,
-        selectable: false,
-        hoverCursor: "default",
-      });
-      img.scaleToWidth(canvas.width);
-      img.scaleToHeight(canvas.height);
-      canvas.add(img).sendToBack();
-      canvas.renderAll();
-    });
-  };
-  reader.readAsDataURL(file);
-});
-
-/**
- * Event listener for save button click.
- */
-saveButton.addEventListener("click", () => {
-  const objects = canvas.getObjects();
-  let imageInfo = {};
-  const rectangles = [];
-  const texts = [];
-
-  objects.forEach((obj) => {
-    if (obj.type === "image") {
-      imageInfo = {
-        width: obj.width * obj.scaleX,
-        height: obj.height * obj.scaleY,
-        left: obj.left,
-        top: obj.top,
-      };
-    } else if (obj.type === "rect") {
-      rectangles.push({
-        width: obj.width * obj.scaleX,
-        height: obj.height * obj.scaleY,
-        left: obj.left,
-        top: obj.top,
-        fill: obj.fill,
-        stroke: obj.stroke,
-        strokeWidth: obj.strokeWidth,
-      });
-    } else if (obj.type === "textbox") {
-      texts.push({
-        text: obj.text,
-        left: obj.left,
-        top: obj.top,
-        fill: obj.fill,
-        fontSize: obj.fontSize,
-        width: obj.width,
-      });
-    }
-  });
-
-  const result = {
-    image: imageInfo,
-    rectangles: rectangles,
-    texts: texts,
-  };
-
-  console.log(result);
-});
