@@ -63,11 +63,14 @@ saveButton.addEventListener("click", () => {
 
   objects.forEach((obj) => {
     if (obj.type === "image") {
+      // Convert image to data URL
+      const imageDataUrl = canvas.toDataURL({ format: "png" });
       imageInfo = {
         width: obj.width * obj.scaleX,
         height: obj.height * obj.scaleY,
         left: obj.left,
         top: obj.top,
+        dataUrl: imageDataUrl, // Include data URL
       };
     } else if (obj.type === "rect") {
       rectangles.push({
