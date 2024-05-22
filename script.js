@@ -8,7 +8,6 @@ const drawTools = document.querySelectorAll(".draw-tool");
 const colorPicker = document.getElementById("colorPicker");
 const saveButton = document.getElementById("saveButton");
 
-// Function to enable drawing tools and color picker
 const enableDrawingTools = () => {
   drawTools.forEach((tool) => {
     tool.addEventListener("click", (e) => {
@@ -45,7 +44,6 @@ document.getElementById("imageLoader").addEventListener("change", (e) => {
       canvas.add(img).sendToBack();
       canvas.renderAll();
 
-      // Once image is uploaded, enable drawing tools
       enableDrawingTools();
     });
   };
@@ -63,14 +61,13 @@ saveButton.addEventListener("click", () => {
 
   objects.forEach((obj) => {
     if (obj.type === "image") {
-      // Convert image to data URL
       const imageDataUrl = canvas.toDataURL({ format: "png" });
       imageInfo = {
         width: obj.width * obj.scaleX,
         height: obj.height * obj.scaleY,
         left: obj.left,
         top: obj.top,
-        dataUrl: imageDataUrl, // Include data URL
+        dataUrl: imageDataUrl,
       };
     } else if (obj.type === "rect") {
       rectangles.push({
