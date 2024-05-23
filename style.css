@@ -1,6 +1,15 @@
+body {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 canvas {
   border: 1px solid black;
+  border-radius: 10px;
 }
 .container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   padding: 20px;
 }

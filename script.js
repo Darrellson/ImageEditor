@@ -72,6 +72,7 @@ saveButton.addEventListener("click", () => {
     } else if (obj.type === "rect") {
       rectangles.push({
         id: `rect${index}`,
+        zIndex: index,
         width: obj.width * obj.scaleX,
         height: obj.height * obj.scaleY,
         left: obj.left,
@@ -85,6 +86,7 @@ saveButton.addEventListener("click", () => {
     } else if (obj.type === "textbox") {
       texts.push({
         id: `text${index}`,
+        zIndex: index,
         text: obj.text,
         left: obj.left,
         top: obj.top,
@@ -214,8 +216,7 @@ const addText = (x, y) => {
     fontSize: 20,
     width: 150,
   });
-  canvas.add(text).setActiveObject(text);
-  canvas.renderAll();
+  canvas.add(text).setActiveObject;
 };
 
 const updateSelectedShapeColor = () => {
