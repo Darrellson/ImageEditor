@@ -8,6 +8,9 @@ const drawTools = document.querySelectorAll(".draw-tool");
 const colorPicker = document.getElementById("colorPicker");
 const saveButton = document.getElementById("saveButton");
 
+/**
+ * Enable drawing tools and setup event listeners.
+ */
 const enableDrawingTools = () => {
   drawTools.forEach((tool) => {
     tool.addEventListener("click", (e) => {
@@ -24,6 +27,9 @@ const enableDrawingTools = () => {
   });
 };
 
+/**
+ * Event listener for loading an image onto the canvas.
+ */
 document.getElementById("imageLoader").addEventListener("change", (e) => {
   const file = e.target.files[0];
   const reader = new FileReader();
@@ -52,6 +58,9 @@ document.getElementById("imageLoader").addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
+/**
+ * Event listener for saving canvas content.
+ */
 saveButton.addEventListener("click", () => {
   const objects = canvas.getObjects();
   let imageInfo = {};
@@ -105,6 +114,10 @@ saveButton.addEventListener("click", () => {
   console.log(result);
 });
 
+/**
+ * Activate drawing mode for a specific shape.
+ * @param {string} shape - The shape to activate drawing mode for.
+ */
 const activateDrawing = (shape) => {
   canvas.isDrawingMode = false;
   canvas.off("mouse:down");
@@ -146,6 +159,11 @@ const activateDrawing = (shape) => {
   });
 };
 
+/**
+ * Draw a rectangle on the canvas.
+ * @param {number} x - The x-coordinate of the starting point.
+ * @param {number} y - The y-coordinate of the starting point.
+ */
 const drawRectangle = (x, y) => {
   const rect = new fabric.Rect({
     left: x,
@@ -162,6 +180,10 @@ const drawRectangle = (x, y) => {
   activeObject = rect;
 };
 
+/**
+ * Adjust the size of the active rectangle while drawing.
+ * @param {fabric.Point} pointer - The current mouse pointer position.
+ */
 const adjustRectangleSize = (pointer) => {
   let width = Math.abs(origX - pointer.x);
   let height = Math.abs(origY - pointer.y);
@@ -183,6 +205,11 @@ const adjustRectangleSize = (pointer) => {
   activeObject.set({ width, height });
 };
 
+/**
+ * Add a text box to the canvas.
+ * @param {number} x - The x-coordinate of the starting point.
+ * @param {number} y - The y-coordinate of the starting point.
+ */
 const addText = (x, y) => {
   const text = new fabric.Textbox("Type here", {
     left: x,
@@ -194,6 +221,9 @@ const addText = (x, y) => {
   canvas.add(text).setActiveObject;
 };
 
+/**
+ * Update the color of the selected shape with the currently selected color.
+ */
 const updateSelectedShapeColor = () => {
   const activeObject = canvas.getActiveObject();
   if (activeObject) {
