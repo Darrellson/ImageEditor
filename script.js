@@ -24,9 +24,6 @@ const enableDrawingTools = () => {
   });
 };
 
-/**
- * Event listener for image loader input element change.
- */
 document.getElementById("imageLoader").addEventListener("change", (e) => {
   const file = e.target.files[0];
   const reader = new FileReader();
@@ -39,8 +36,13 @@ document.getElementById("imageLoader").addEventListener("change", (e) => {
         selectable: false,
         hoverCursor: "default",
       });
-      img.scaleToWidth(canvas.width);
-      img.scaleToHeight(canvas.height);
+      const canvasAspect = canvas.width / canvas.height;
+      const imgAspect = img.width / img.height;
+      if (canvasAspect > imgAspect) {
+        img.scaleToWidth(canvas.width);
+      } else {
+        img.scaleToHeight(canvas.height);
+      }
       canvas.add(img).sendToBack();
       canvas.renderAll();
 
@@ -50,9 +52,6 @@ document.getElementById("imageLoader").addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
-/**
- * Event listener for save button click.
- */
 saveButton.addEventListener("click", () => {
   const objects = canvas.getObjects();
   let imageInfo = {};
@@ -100,10 +99,6 @@ saveButton.addEventListener("click", () => {
   console.log(result);
 });
 
-/**
- * Activates drawing mode based on the selected shape.
- * @param {string} shape - The shape to be drawn.
- */
 const activateDrawing = (shape) => {
   canvas.isDrawingMode = false;
   canvas.off("mouse:down");
@@ -145,11 +140,6 @@ const activateDrawing = (shape) => {
   });
 };
 
-/**
- * Draws a rectangle at the given coordinates.
- * @param {number} x - The x-coordinate.
- * @param {number} y - The y-coordinate.
- */
 const drawRectangle = (x, y) => {
   const rect = new fabric.Rect({
     left: x,
@@ -165,10 +155,6 @@ const drawRectangle = (x, y) => {
   activeObject = rect;
 };
 
-/**
- * Adjusts the size of the rectangle during drawing.
- * @param {object} pointer - The pointer object.
- */
 const adjustRectangleSize = (pointer) => {
   const width = Math.abs(origX - pointer.x);
   const height = Math.abs(origY - pointer.y);
@@ -181,11 +167,6 @@ const adjustRectangleSize = (pointer) => {
   activeObject.set({ width, height });
 };
 
-/**
- * Adds text at the given coordinates.
- * @param {number} x - The x-coordinate.
- * @param {number} y - The y-coordinate.
- */
 const addText = (x, y) => {
   const text = new fabric.Textbox("Type here", {
     left: x,
@@ -198,9 +179,6 @@ const addText = (x, y) => {
   canvas.renderAll();
 };
 
-/**
- * Updates the color of the selected shape on the canvas.
- */
 const updateSelectedShapeColor = () => {
   const activeObject = canvas.getActiveObject();
   if (activeObject) {
