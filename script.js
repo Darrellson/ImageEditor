@@ -57,7 +57,6 @@ saveButton.addEventListener("click", () => {
   let imageInfo = {};
   const rectangles = [];
   const texts = [];
-  const overlaps = [];
 
   objects.forEach((obj, index) => {
     if (obj.type === "image") {
@@ -97,38 +96,14 @@ saveButton.addEventListener("click", () => {
     }
   });
 
-  for (let i = 0; i < objects.length; i++) {
-    for (let j = i + 1; j < objects.length; j++) {
-      if (isOverlapping(objects[i], objects[j])) {
-        overlaps.push({
-          obj1: objects[i].type === "rect" ? `rect${i}` : `text${i}`,
-          obj2: objects[j].type === "rect" ? `rect${j}` : `text${j}`,
-        });
-      }
-    }
-  }
-
   const result = {
     image: imageInfo,
     rectangles: rectangles,
     texts: texts,
-    overlaps: overlaps,
   };
 
   console.log(result);
 });
-
-const isOverlapping = (obj1, obj2) => {
-  const obj1Bounds = obj1.getBoundingRect();
-  const obj2Bounds = obj2.getBoundingRect();
-
-  return !(
-    obj1Bounds.left > obj2Bounds.left + obj2Bounds.width ||
-    obj1Bounds.left + obj1Bounds.width < obj2Bounds.left ||
-    obj1Bounds.top > obj2Bounds.top + obj2Bounds.height ||
-    obj1Bounds.top + obj1Bounds.height < obj2Bounds.top
-  );
-};
 
 const activateDrawing = (shape) => {
   canvas.isDrawingMode = false;
