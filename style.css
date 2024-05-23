@@ -1,15 +1,35 @@
 body {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
 }
-canvas {
-  border: 1px solid black;
-  border-radius: 10px;
-}
+
 .container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  padding: 20px;
+  align-items: center;
+  margin-top: 50px;
+}
+
+canvas {
+  border: 2px solid #333;
+  border-radius: 10px;
+  cursor: crosshair;
+}
+
+.btn {
+  margin: 5px;
+}
+
+#colorPicker {
+  margin-left: 10px;
+}
+
+#imageLoader {
+  display: inline-block;
+  color: #a7a7a7;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
 }
