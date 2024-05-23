@@ -8,15 +8,24 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <label for="imageLoader" class="btn btn-primary">Upload Image</label>
-        <input type="file" id="imageLoader" name="imageLoader" accept="image/*" style="display: none;">
-        <button class="btn btn-primary draw-tool" data-shape="rect">Draw Rectangle</button>
-        <button class="btn btn-secondary draw-tool" data-shape="text">Add Text</button>
-        <input type="color" id="colorPicker" value="#000000">
-        <button class="btn btn-success" id="saveButton">Save</button>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="container">
+                    <label for="imageLoader" class="btn btn-primary">Upload Image</label>
+                    <input type="file" id="imageLoader" name="imageLoader" accept="image/*" style="display: none;">
+                    <button class="btn btn-primary draw-tool" data-shape="rect">Draw Rectangle</button>
+                    <button class="btn btn-secondary draw-tool" data-shape="text">Add Text</button>
+                    <input type="color" id="colorPicker" value="#000000">
+                    <button class="btn btn-success" id="saveButton">Save</button>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <canvas id='canvas' width="800" height="600"></canvas>
+            </div>
+        </div>
     </div>
- <canvas id='canvas' width="800" height="600"></canvas>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -24,3 +33,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
