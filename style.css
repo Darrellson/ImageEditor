@@ -1,5 +1,5 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: "Roboto", sans-serif;
   margin: 20px;
 }
 
@@ -8,6 +8,8 @@ body {
   padding: 10px;
   max-width: 800px;
   margin: auto;
+  border-radius: 5px;
+  background: #f9f9f9;
 }
 
 #toolbar button {
@@ -18,6 +20,8 @@ body {
   min-height: 300px;
   border: 1px solid #ccc;
   padding: 10px;
+  border-radius: 5px;
+  background: #fff;
 }
 
 #html-view {
@@ -46,31 +50,4 @@ body {
 #toolbar select:hover,
 #toolbar input[type="color"]:hover {
   background-color: #e0e0e0;
-}
-
-body {
-  font-family: "Roboto", sans-serif;
-}
-#editor-container {
-  border: 1px solid #ccc;
-  padding: 10px;
-  border-radius: 5px;
-  background: #f9f9f9;
-}
-#editor {
-  min-height: 300px;
-  border: 1px solid #ccc;
-  padding: 10px;
-  border-radius: 5px;
-  background: #fff;
-}
-#html-view {
-  display: none;
-  min-height: 300px;
-}
-.btn-group .btn {
-  margin-right: 5px;
-}
-.btn-toolbar {
-  margin-bottom: 10px;
 }
