@@ -1,35 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canvas Drawing</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>WYSIWYG HTML Editor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-3">
-                <div class="container">
-                    <label for="imageLoader" class="btn btn-primary">Upload Image</label>
-                    <input type="file" id="imageLoader" name="imageLoader" accept="image/*" style="display: none;">
-                    <button class="btn btn-primary draw-tool" data-shape="rect">Draw Rectangle</button>
-                    <button class="btn btn-secondary draw-tool" data-shape="text">Add Text</button>
-                    <input type="color" id="colorPicker" value="#000000">
-                    <button class="btn btn-success" id="saveButton">Save</button>
-                </div>
-            </div>
-            <div class="col-md-9">
-                <canvas id='canvas' width="800" height="600"></canvas>
+    <div id="editor-container" class="container mt-3">
+        <div id="toolbar" class="btn-toolbar" role="toolbar">
+            <div class="btn-group mr-2" role="group" aria-label="Editor controls">
+                <button type="button" class="btn btn-light" aria-label="Bold" onclick="execCmd('bold')"><i
+                        class="material-icons">format_bold</i></button>
+                <button type="button" class="btn btn-light" aria-label="Italic" onclick="execCmd('italic')"><i
+                        class="material-icons">format_italic</i></button>
+                <button type="button" class="btn btn-light" aria-label="Underline" onclick="execCmd('underline')"><i
+                        class="material-icons">format_underlined</i></button>
+                <button type="button" class="btn btn-light" aria-label="Unordered List"
+                    onclick="execCmd('insertUnorderedList')"><i class="material-icons">format_list_bulleted</i></button>
+                <button type="button" class="btn btn-light" aria-label="Ordered List"
+                    onclick="execCmd('insertOrderedList')"><i class="material-icons">format_list_numbered</i></button>
+                <button type="button" class="btn btn-light" aria-label="Insert Link"
+                    onclick="execCmd('createLink', prompt('Enter the URL:', 'http://'))"><i
+                        class="material-icons">link</i></button>
+                <button type="button" class="btn btn-light" aria-label="Remove Link" onclick="execCmd('unlink')"><i
+                        class="material-icons">link_off</i></button>
+                <button type="button" class="btn btn-light" aria-label="Insert Image"
+                    onclick="execCmd('insertImage', prompt('Enter the image URL:', 'http://'))"><i
+                        class="material-icons">image</i></button>
+                <button type="button" class="btn btn-light" aria-label="Insert Table" onclick="insertTable()"><i
+                        class="material-icons">table_chart</i></button>
+                <input type="color" id="colorPicker" class="form-control form-control-color" aria-label="Text Color"
+                    onchange="execCmd('foreColor', this.value)">
+                <select class="custom-select" aria-label="Font Size" onchange="execCmd('fontSize', this.value)">
+                    <option value="1">10pt</option>
+                    <option value="2">12pt</option>
+                    <option value="3" selected>14pt</option>
+                    <option value="4">16pt</option>
+                    <option value="5">18pt</option>
+                    <option value="6">24pt</option>
+                    <option value="7">36pt</option>
+                </select>
+                <select class="custom-select" aria-label="Font Family" onchange="execCmd('fontName', this.value)">
+                    <option value="Arial">Arial</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Courier New">Courier New</option>
+                </select>
+                <button type="button" class="btn btn-light" aria-label="Align Left" onclick="execCmd('justifyLeft')"><i
+                        class="material-icons">format_align_left</i></button>
+                <button type="button" class="btn btn-light" aria-label="Align Center"
+                    onclick="execCmd('justifyCenter')"><i class="material-icons">format_align_center</i></button>
+                <button type="button" class="btn btn-light" aria-label="Align Right"
+                    onclick="execCmd('justifyRight')"><i class="material-icons">format_align_right</i></button>
+                <button type="button" class="btn btn-light" aria-label="Justify" onclick="execCmd('justifyFull')"><i
+                        class="material-icons">format_align_justify</i></button>
+                <button type="button" class="btn btn-light" aria-label="Toggle HTML View"
+                    onclick="toggleHTMLView()">code</button>
             </div>
         </div>
+        <div id="editor" contenteditable="true"></div>
+        <textarea id="html-view" class="form-control"></textarea>
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
     <script src="script.js"></script>
 </body>
+
 </html>
